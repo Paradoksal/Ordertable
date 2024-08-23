@@ -162,6 +162,7 @@ th.sorted-desc::after {
     margin-left: 8px;
 }
 
+/* Mobiltilpasning */
 @media (max-width: 768px) {
     .order-stats {
         flex-direction: column;
@@ -179,5 +180,20 @@ th.sorted-desc::after {
 
     th, td {
         padding: 8px; /* Redusert polstring for mindre skjermer */
+    }
+
+    /* Gjør tabellen rullbar på små skjermer */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    /* Endre knappenes posisjon på små skjermer */
+    #theme-toggle {
+        position: relative;
+        top: auto;
+        left: auto;
+        margin-bottom: 20px;
     }
 }
