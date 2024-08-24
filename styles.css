@@ -58,12 +58,7 @@ body.dark #theme-toggle:hover {
     box-shadow: 0 6px 8px rgba(255, 255, 255, 0.2);
 }
 
-#total-orders {
-    margin-bottom: 20px;
-    font-size: 20px;
-    text-align: center;
-}
-
+#total-orders,
 #remaining-orders {
     margin-bottom: 20px;
     font-size: 20px;
@@ -162,38 +157,26 @@ th.sorted-desc::after {
     margin-left: 8px;
 }
 
-/* Mobiltilpasning */
-@media (max-width: 768px) {
-    .order-stats {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+/* Stil for totalraden */
+tfoot .total-row {
+    font-weight: normal; /* Normal skriftvekt */
+    font-size: 14px; /* Litt mindre skriftstørrelse */
+    background-color: #d0d0d0; /* Lysere bakgrunn */
+    color: #333; /* Mørkere tekstfarge for å skille seg ut */
+}
 
-    .order-stats span {
-        margin: 5px 0;
-        font-size: 18px;
-    }
+body.dark tfoot .total-row {
+    background-color: #2c2c2c; /* Mørkere bakgrunn i mørkt tema */
+    color: #e0e0e0; /* Lys tekstfarge i mørkt tema */
+}
 
-    table {
-        font-size: 16px; /* Redusert skriftstørrelse for mindre skjermer */
-    }
+/* Legg til kursiv for teksten "Totalt" og tallene i totalraden */
+tfoot .total-row strong {
+    font-style: italic; /* Kursiv */
+}
 
-    th, td {
-        padding: 8px; /* Redusert polstring for mindre skjermer */
-    }
-
-    /* Gjør tabellen rullbar på små skjermer */
-    table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-
-    /* Endre knappenes posisjon på små skjermer */
-    #theme-toggle {
-        position: relative;
-        top: auto;
-        left: auto;
-        margin-bottom: 20px;
-    }
+tfoot td {
+    border-top: 2px solid #ccc; /* Tydelig skillelinje */
+    padding: 8px; /* Redusert polstring for totalrad */
+    font-style: italic; /* Kursiv */
 }
