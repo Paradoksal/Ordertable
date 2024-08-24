@@ -49,6 +49,10 @@
     </table>
 
     <script>
+        // Globale variabler for sorteringsinnstillinger
+        let currentSortColumnIndex = 0; // Lagre indeksen til den nåværende sorteringskolonnen
+        let currentSortOrder = true; // true for stigende, false for synkende
+
         // Hent og sett tema fra localStorage
         const theme = localStorage.getItem('theme') || 'light';
         document.body.classList.toggle('dark', theme === 'dark');
@@ -71,10 +75,11 @@
             headers.forEach((header, index) => {
                 header.addEventListener('click', () => {
                     const order = header.dataset.sort;
-                    const isAscending = header.classList.contains('sorted-asc');
-                    sortTable(index, order, !isAscending);
+                    currentSortOrder = !header.classList.contains('sorted-asc');
+                    currentSortColumnIndex = index;
+                    sortTable(index, order, currentSortOrder);
                     headers.forEach(h => h.classList.remove('sorted-asc', 'sorted-desc'));
-                    header.classList.add(isAscending ? 'sorted-desc' : 'sorted-asc');
+                    header.classList.add(currentSortOrder ? 'sorted-asc' : 'sorted-desc');
                 });
             });
         });
@@ -88,9 +93,10 @@
                 updateTable(data.tabellData);
                 updateStats(data.fullforteOrdre);
                 updateRemainingOrders(data.tabellData);
+
                 // Sorter tabellen etter oppdatering
-                const firstHeader = document.querySelector('#data-table th');
-                sortTable(0, firstHeader.dataset.sort, true);
+                const headers = document.querySelectorAll('#data-table th');
+                sortTable(currentSortColumnIndex, headers[currentSortColumnIndex].dataset.sort, currentSortOrder);
             } catch (error) {
                 console.error('Error fetching data:', error);
                 document.querySelector('#total-orders').textContent = 'Kunne ikke laste data.';
@@ -152,6 +158,7 @@
         function sortTable(columnIndex, type, ascending) {
             const table = document.querySelector('#data-table');
             const rows = Array.from(table.querySelectorAll('tbody tr'));
+
             const compare = (a, b) => {
                 const aText = a.children[columnIndex].textContent.trim();
                 const bText = b.children[columnIndex].textContent.trim();
@@ -160,6 +167,7 @@
                 }
                 return aText.localeCompare(bText) * (ascending ? 1 : -1);
             };
+
             rows.sort(compare);
             table.querySelector('tbody').append(...rows);
         }
