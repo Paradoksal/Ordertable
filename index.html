@@ -119,9 +119,9 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${vareeier}</td>
-                    <td>${formatNumber(parseInt(ordre.autostore) || 0)}</td>
-                    <td>${formatNumber(parseInt(ordre.delvisPlukket) || 0)}</td>
-                    <td>${formatNumber(parseInt(ordre.manueltPlukk) || 0)}</td>
+                    <td>${formatNumber(parseInt(ordre.autostore) || 0) || ''}</td>
+                    <td>${formatNumber(parseInt(ordre.delvisPlukket) || 0) || ''}</td>
+                    <td>${formatNumber(parseInt(ordre.manueltPlukk) || 0) || ''}</td>
                 `;
                 tableBody.appendChild(row);
                 totalAutostore += parseInt(ordre.autostore) || 0;
@@ -130,9 +130,9 @@
             }
 
             // Oppdater totaler i tabellens bunn
-            document.getElementById('total-autostore').textContent = formatNumber(totalAutostore);
-            document.getElementById('total-delvis-plukket').textContent = formatNumber(totalDelvisPlukket);
-            document.getElementById('total-manuelt-plukk').textContent = formatNumber(totalManueltPlukk);
+            document.getElementById('total-autostore').textContent = totalAutostore > 0 ? formatNumber(totalAutostore) : '';
+            document.getElementById('total-delvis-plukket').textContent = totalDelvisPlukket > 0 ? formatNumber(totalDelvisPlukket) : '';
+            document.getElementById('total-manuelt-plukk').textContent = totalManueltPlukk > 0 ? formatNumber(totalManueltPlukk) : '';
         }
 
         // Oppdater statistikk-seksjonen
