@@ -237,15 +237,19 @@ function loadSettings() {
 
 
     // Oppdater tabellkolonnene basert på innstillinger
-    function updateTableVisibility() {
-        document.querySelectorAll('#data-table .autostore').forEach(cell => cell.style.display = localStorage.getItem('showAutostore') === 'true' ? '' : 'none');
-        document.querySelectorAll('#data-table .partial').forEach(cell => cell.style.display = localStorage.getItem('showPartial') === 'true' ? '' : 'none');
-        document.querySelectorAll('#data-table .manual').forEach(cell => cell.style.display = localStorage.getItem('showManual') === 'true' ? '' : 'none');
+function updateTableVisibility() {
+    const showAutostore = localStorage.getItem('showAutostore') !== 'false';  // Standard til true
+    const showPartial = localStorage.getItem('showPartial') !== 'false';      // Standard til true
+    const showManual = localStorage.getItem('showManual') !== 'false';        // Standard til true
 
-        document.querySelectorAll('#data-table thead th:nth-child(2)').forEach(th => th.style.display = localStorage.getItem('showAutostore') === 'true' ? '' : 'none');
-        document.querySelectorAll('#data-table thead th:nth-child(3)').forEach(th => th.style.display = localStorage.getItem('showPartial') === 'true' ? '' : 'none');
-        document.querySelectorAll('#data-table thead th:nth-child(4)').forEach(th => th.style.display = localStorage.getItem('showManual') === 'true' ? '' : 'none');
-    }
+    document.querySelectorAll('#data-table .autostore').forEach(cell => cell.style.display = showAutostore ? '' : 'none');
+    document.querySelectorAll('#data-table .partial').forEach(cell => cell.style.display = showPartial ? '' : 'none');
+    document.querySelectorAll('#data-table .manual').forEach(cell => cell.style.display = showManual ? '' : 'none');
+
+    document.querySelectorAll('#data-table thead th:nth-child(2)').forEach(th => th.style.display = showAutostore ? '' : 'none');
+    document.querySelectorAll('#data-table thead th:nth-child(3)').forEach(th => th.style.display = showPartial ? '' : 'none');
+    document.querySelectorAll('#data-table thead th:nth-child(4)').forEach(th => th.style.display = showManual ? '' : 'none');
+}
 
     // Hent data ved først lasting av siden og deretter hvert minutt
     document.addEventListener('DOMContentLoaded', () => {
