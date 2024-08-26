@@ -5,12 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ordreoversikt</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Innstillingspanel */
+        #settings-panel {
+            display: none; /* Skjult som standard */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            z-index: 1000;
+            background-color: #fff; /* Legg til ønsket bakgrunnsfarge her */
+        }
+
+        #settings-panel h2 {
+            margin-top: 0;
+        }
+
+        #settings-panel label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #settings-panel input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        #settings-panel button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #ff9800;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #settings-panel button:hover {
+            background-color: #e07b39;
+        }
+
+        #settings-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px;
+            background-color: #ff9800;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 24px;
+            transition: background-color 0.3s;
+        }
+
+        #settings-icon:hover {
+            background-color: #e07b39;
+        }
+
+        /* Mørkt tema stiler for innstillingspanelet */
+        body.dark #settings-panel {
+            background-color: #333;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        body.dark #settings-panel label {
+            color: #e0e0e0;
+        }
+
+        body.dark #settings-panel button {
+            background-color: #555;
+            color: #ff9800;
+        }
+
+        body.dark #settings-panel button:hover {
+            background-color: #666;
+        }
+    </style>
 </head>
 <body>
     <h1>Ordreoversikt</h1>
 
     <!-- Tema-bytte knapp -->
     <button id="theme-toggle">Bytt til mørkt tema</button>
+
+    <!-- Innstillingsknapp -->
+    <button id="settings-icon">⚙️</button>
+
+    <!-- Innstillingspanel -->
+    <div id="settings-panel">
+        <h2>Velg kolonner</h2>
+        <label><input type="checkbox" id="show-autostore" checked> AutoStore Ordre</label>
+        <label><input type="checkbox" id="show-partial" checked> Delvis Plukket Ordre</label>
+        <label><input type="checkbox" id="show-manual" checked> Manuelt Plukk Ordre</label>
+        <button id="save-settings">Lagre</button>
+    </div>
 
     <div id="total-orders">
         Totalt fullførte ordre
@@ -30,9 +125,9 @@
         <thead>
             <tr>
                 <th data-sort="string">Vareeier</th>
-                <th data-sort="number">AutoStore Ordre</th>
-                <th data-sort="number">Delvis Plukket Ordre</th>
-                <th data-sort="number">Manuelt Plukk Ordre</th>
+                <th data-sort="number" class="autostore">AutoStore Ordre</th>
+                <th data-sort="number" class="partial">Delvis Plukket Ordre</th>
+                <th data-sort="number" class="manual">Manuelt Plukk Ordre</th>
             </tr>
         </thead>
         <tbody>
@@ -42,16 +137,16 @@
             <tr class="total-row">
                 <td><strong>Totalt</strong></td>
                 <td id="total-autostore">0</td>
-                <td id="total-delvis-plukket">0</td>
-                <td id="total-manuelt-plukk">0</td>
+                <td id="total-partial">0</td>
+                <td id="total-manual">0</td>
             </tr>
         </tfoot>
     </table>
 
     <script>
         // Globale variabler for sorteringsinnstillinger
-        let currentSortColumnIndex = 0; // Lagre indeksen til den nåværende sorteringskolonnen
-        let currentSortOrder = true; // true for stigende, false for synkende
+        let currentSortColumnIndex = 1; // Som standard er det AutoStore Ordre (index 1)
+        let currentSortOrder = false; // false for synkende, true for stigende
 
         // Hent og sett tema fra localStorage
         const theme = localStorage.getItem('theme') || 'light';
@@ -65,10 +160,46 @@
             document.getElementById('theme-toggle').textContent = isDark ? 'Bytt til Lyst Tema' : 'Bytt til Mørkt Tema';
         });
 
+// Globale variabler for innstillingspanelet
+let settingsPanelOpen = false;
+
+// Vis/skjul innstillingspanelet
+document.getElementById('settings-icon').addEventListener('click', () => {
+    const settingsPanel = document.getElementById('settings-panel');
+    if (settingsPanelOpen) {
+        // Hvis panelet er åpent, lukk det
+        settingsPanel.style.display = 'none';
+        settingsPanelOpen = false;
+    } else {
+        // Hvis panelet er lukket, åpne det
+        settingsPanel.style.display = 'block';
+        settingsPanelOpen = true;
+    }
+});
+
+// Lagre innstillinger og skjul panelet
+document.getElementById('save-settings').addEventListener('click', () => {
+    const showAutostore = document.getElementById('show-autostore').checked;
+    const showPartial = document.getElementById('show-partial').checked;
+    const showManual = document.getElementById('show-manual').checked;
+
+    localStorage.setItem('showAutostore', showAutostore);
+    localStorage.setItem('showPartial', showPartial);
+    localStorage.setItem('showManual', showManual);
+
+    updateTableVisibility();
+    // Skjul panelet etter å ha lagret innstillinger
+    document.getElementById('settings-panel').style.display = 'none';
+    settingsPanelOpen = false;
+});
+
         // Hent data ved først lasting av siden og deretter hvert minutt
         document.addEventListener('DOMContentLoaded', () => {
             fetchData();
             setInterval(fetchData, 60000);
+
+            // Last inn innstillinger
+            loadSettings();
 
             // Legg til sorteringsfunksjonalitet på tabellkolonner
             const headers = document.querySelectorAll('#data-table th');
@@ -112,27 +243,27 @@
         // Oppdater tabellen med data
         function updateTable(tabellData) {
             const tableBody = document.querySelector('#data-table tbody');
-            tableBody.innerHTML = '';
-            let totalAutostore = 0, totalDelvisPlukket = 0, totalManueltPlukk = 0;
+            tableBody.innerHTML = ''; // Tøm tabellen først
+
+            let totalAutostore = 0, totalPartial = 0, totalManual = 0;
 
             for (const [vareeier, ordre] of Object.entries(tabellData)) {
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${vareeier}</td>
-                    <td>${parseInt(ordre.autostore) > 0 ? formatNumber(parseInt(ordre.autostore)) : ''}</td>
-                    <td>${parseInt(ordre.delvisPlukket) > 0 ? formatNumber(parseInt(ordre.delvisPlukket)) : ''}</td>
-                    <td>${parseInt(ordre.manueltPlukk) > 0 ? formatNumber(parseInt(ordre.manueltPlukk)) : ''}</td>
-                `;
+                row.innerHTML = 
+                    `<td>${vareeier}</td>
+                    <td class="autostore">${formatNumber(parseInt(ordre.autostore) || '')}</td>
+                    <td class="partial">${formatNumber(parseInt(ordre.delvisPlukket) || '')}</td>
+                    <td class="manual">${formatNumber(parseInt(ordre.manueltPlukk) || '')}</td>`;
                 tableBody.appendChild(row);
                 totalAutostore += parseInt(ordre.autostore) || 0;
-                totalDelvisPlukket += parseInt(ordre.delvisPlukket) || 0;
-                totalManueltPlukk += parseInt(ordre.manueltPlukk) || 0;
+                totalPartial += parseInt(ordre.delvisPlukket) || 0;
+                totalManual += parseInt(ordre.manueltPlukk) || 0;
             }
 
             // Oppdater totaler i tabellens bunn
-            document.getElementById('total-autostore').textContent = totalAutostore > 0 ? formatNumber(totalAutostore) : '';
-            document.getElementById('total-delvis-plukket').textContent = totalDelvisPlukket > 0 ? formatNumber(totalDelvisPlukket) : '';
-            document.getElementById('total-manuelt-plukk').textContent = totalManueltPlukk > 0 ? formatNumber(totalManueltPlukk) : '';
+            document.getElementById('total-autostore').textContent = formatNumber(totalAutostore || '');
+            document.getElementById('total-partial').textContent = formatNumber(totalPartial || '');
+            document.getElementById('total-manual').textContent = formatNumber(totalManual || '');
         }
 
         // Oppdater statistikk-seksjonen
@@ -151,7 +282,7 @@
                 totalRemaining += parseInt(ordre.delvisPlukket) || 0;
                 totalRemaining += parseInt(ordre.manueltPlukk) || 0;
             }
-            document.querySelector('#remaining-total').textContent = formatNumber(totalRemaining);
+            document.querySelector('#remaining-total').textContent = formatNumber(totalRemaining || '');
         }
 
         // Sorter tabellen etter kolonne
@@ -162,14 +293,43 @@
             const compare = (a, b) => {
                 const aText = a.children[columnIndex].textContent.trim();
                 const bText = b.children[columnIndex].textContent.trim();
+
+                // Hvis cellene er tomme, sett dem til 0
+                const aValue = aText === '' ? 0 : parseFloat(aText.replace(/\s/g, ''));
+                const bValue = bText === '' ? 0 : parseFloat(bText.replace(/\s/g, ''));
+
                 if (type === 'number') {
-                    return (parseFloat(aText.replace(/\s/g, '')) - parseFloat(bText.replace(/\s/g, ''))) * (ascending ? 1 : -1);
+                    return (aValue - bValue) * (ascending ? 1 : -1);
                 }
                 return aText.localeCompare(bText) * (ascending ? 1 : -1);
             };
 
             rows.sort(compare);
             table.querySelector('tbody').append(...rows);
+        }
+
+        // Last inn innstillinger og oppdater tabellvisibilitet
+        function loadSettings() {
+            const showAutostore = localStorage.getItem('showAutostore') === 'true';
+            const showPartial = localStorage.getItem('showPartial') === 'true';
+            const showManual = localStorage.getItem('showManual') === 'true';
+
+            document.getElementById('show-autostore').checked = showAutostore;
+            document.getElementById('show-partial').checked = showPartial;
+            document.getElementById('show-manual').checked = showManual;
+
+            updateTableVisibility();
+        }
+
+        // Oppdater tabellkolonnene basert på innstillinger
+        function updateTableVisibility() {
+            document.querySelectorAll('#data-table .autostore').forEach(cell => cell.style.display = localStorage.getItem('showAutostore') === 'true' ? '' : 'none');
+            document.querySelectorAll('#data-table .partial').forEach(cell => cell.style.display = localStorage.getItem('showPartial') === 'true' ? '' : 'none');
+            document.querySelectorAll('#data-table .manual').forEach(cell => cell.style.display = localStorage.getItem('showManual') === 'true' ? '' : 'none');
+            
+            document.querySelectorAll('#data-table thead th:nth-child(2)').forEach(th => th.style.display = localStorage.getItem('showAutostore') === 'true' ? '' : 'none');
+            document.querySelectorAll('#data-table thead th:nth-child(3)').forEach(th => th.style.display = localStorage.getItem('showPartial') === 'true' ? '' : 'none');
+            document.querySelectorAll('#data-table thead th:nth-child(4)').forEach(th => th.style.display = localStorage.getItem('showManual') === 'true' ? '' : 'none');
         }
     </script>
 </body>
