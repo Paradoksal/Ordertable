@@ -119,9 +119,9 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${vareeier}</td>
-                    <td>${formatNumber(parseInt(ordre.autostore) || 0) || ''}</td>
-                    <td>${formatNumber(parseInt(ordre.delvisPlukket) || 0) || ''}</td>
-                    <td>${formatNumber(parseInt(ordre.manueltPlukk) || 0) || ''}</td>
+                    <td>${parseInt(ordre.autostore) > 0 ? formatNumber(parseInt(ordre.autostore)) : ''}</td>
+                    <td>${parseInt(ordre.delvisPlukket) > 0 ? formatNumber(parseInt(ordre.delvisPlukket)) : ''}</td>
+                    <td>${parseInt(ordre.manueltPlukk) > 0 ? formatNumber(parseInt(ordre.manueltPlukk)) : ''}</td>
                 `;
                 tableBody.appendChild(row);
                 totalAutostore += parseInt(ordre.autostore) || 0;
