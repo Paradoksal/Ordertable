@@ -207,23 +207,34 @@
     });
 
     // Last inn innstillinger og oppdater tabellvisibilitet
-    function loadSettings() {
-        const showAutostore = localStorage.getItem('showAutostore') === 'true';
-        const showPartial = localStorage.getItem('showPartial') === 'true';
-        const showManual = localStorage.getItem('showManual') === 'true';
-        const defaultSortColumn = localStorage.getItem('defaultSortColumn') || '1';
+function loadSettings() {
+    // Hent verdier fra localStorage eller sett dem til true som standard
+    const showAutostore = localStorage.getItem('showAutostore');
+    const showPartial = localStorage.getItem('showPartial');
+    const showManual = localStorage.getItem('showManual');
 
-        document.getElementById('show-autostore').checked = showAutostore;
-        document.getElementById('show-partial').checked = showPartial;
-        document.getElementById('show-manual').checked = showManual;
-        document.getElementById('default-sort-column').value = defaultSortColumn;
+    // Sett standardverdier til true hvis de ikke finnes i localStorage
+    const showAutostoreChecked = showAutostore === null ? true : showAutostore === 'true';
+    const showPartialChecked = showPartial === null ? true : showPartial === 'true';
+    const showManualChecked = showManual === null ? true : showManual === 'true';
 
-        updateTableVisibility();
-        const headers = document.querySelectorAll('#data-table th');
-        currentSortColumnIndex = parseInt(defaultSortColumn);
-        currentSortOrder = false; // Standard sorteringsrekkefølge (synkende)
-        sortTable(currentSortColumnIndex, headers[currentSortColumnIndex].dataset.sort, currentSortOrder);
-    }
+    // Oppdater checkboxene og kolonnevisibilitet
+    document.getElementById('show-autostore').checked = showAutostoreChecked;
+    document.getElementById('show-partial').checked = showPartialChecked;
+    document.getElementById('show-manual').checked = showManualChecked;
+    
+    const defaultSortColumn = localStorage.getItem('defaultSortColumn') || '1';
+    document.getElementById('default-sort-column').value = defaultSortColumn;
+
+    updateTableVisibility();
+
+    const headers = document.querySelectorAll('#data-table th');
+    currentSortColumnIndex = parseInt(defaultSortColumn);
+    currentSortOrder = false; // Standard sorteringsrekkefølge (synkende)
+    sortTable(currentSortColumnIndex, headers[currentSortColumnIndex].dataset.sort, currentSortOrder);
+}
+
+
 
     // Oppdater tabellkolonnene basert på innstillinger
     function updateTableVisibility() {
