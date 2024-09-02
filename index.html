@@ -120,7 +120,7 @@
         Totalt fullførte ordre
         <div class="order-stats">
             I dag: <span id="today" class="number">Laster...</span>
-            Denne uken: <span id="week" class="number">Laster...</span>
+            I går: <span id="yesterday" class="number">Laster...</span>
             Denne måneden: <span id="month" class="number">Laster...</span>
             I år: <span id="year" class="number">Laster...</span>
         </div>
@@ -330,7 +330,7 @@ function updateTableVisibility() {
     // Oppdater statistikk-seksjonen
     function updateStats(fullforteOrdre) {
         document.getElementById('today').textContent = formatNumber(fullforteOrdre.iDag || '0');
-        document.getElementById('week').textContent = formatNumber(fullforteOrdre.denneUken || '0');
+        document.getElementById('yesterday').textContent = formatNumber(fullforteOrdre.iGar || '0');
         document.getElementById('month').textContent = formatNumber(fullforteOrdre.denneManeden || '0');
         document.getElementById('year').textContent = formatNumber(fullforteOrdre.iAr || '0');
     }
